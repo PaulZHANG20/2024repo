@@ -1,0 +1,55 @@
+%This code is created by ChatGPT, and verified with necessary revisions. 
+clc
+clear all
+
+% Generate synthetic data
+rng(0); % Set random seed for reproducibility
+X = linspace(0, 10, 20)'; % Input data
+y = sin(X) + 0.2*randn(size(X)); % Output data with noise
+
+% Define GPR parameters
+sigma_f = 1; % Signal variance
+sigma_n = 0.1; % Noise variance
+
+% Define the kernel function (Squared Exponential Kernel)
+kernel = @(x1, x2) sigma_f^2 * exp(-((x1 - x2)'*(x1 - x2)) / (2*1^2));
+
+% Compute the kernel matrices
+K = zeros(length(X), length(X));
+for i = 1:length(X)
+    for j = 1:length(X)
+        K(i, j) = kernel(X(i), X(j));
+    end
+end
+K_noise = K + sigma_n^2 * eye(length(X));
+
+% Generate test points
+X_test = linspace(0, 10, 100)'; % Test input data
+
+% Compute the predictive mean and variance
+K_test = zeros(length(X), length(X_test));
+for i = 1:length(X)
+    for j = 1:length(X_test)
+        K_test(i, j) = kernel(X(i), X_test(j));
+    end
+end
+K_test_test = zeros(length(X_test), length(X_test));
+for i = 1:length(X_test)
+    for j = 1:length(X_test)
+        K_test_test(i, j) = kernel(X_test(i), X_test(j));
+    end
+end
+y_pred_mean = K_test' / K_noise * y;
+y_pred_var = diag(K_test_test - K_test' / K_noise * K_test);
+
+% Plot the results
+figure;
+hold on;
+plot(X, y, 'ko', 'MarkerSize', 6, 'LineWidth', 1.5); % Training data
+plot(X_test, y_pred_mean, 'b', 'LineWidth', 2); % Predictive mean
+fill([X_test; flipud(X_test)], [y_pred_mean + 2*sqrt(y_pred_var); flipud(y_pred_mean - 2*sqrt(y_pred_var))], 'b', 'FaceAlpha', 0.3); % Uncertainty
+xlabel('X');
+ylabel('y');
+title('Gaussian Process Regression');
+legend('Training Data', 'Predictive Mean', 'Uncertainty');
+hold off;
