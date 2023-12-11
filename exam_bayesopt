@@ -1,0 +1,33 @@
+%this code is created by ChatGPT (does not work well though), with necessary revisions. 
+
+clc
+clear
+
+% Define the search space
+x1 = optimizableVariable('x1', [0, 5]);
+x2 = optimizableVariable('x2', [0, 5]);
+vars = [x1,x2];
+
+% Define the objective function
+objFcn = @(vars) (vars.x1-2)^2 + (vars.x2-3)^2;
+
+
+% Set the number of optimization iterations
+maxIterations = 20;
+
+% % Create the optimization problem object
+% problem = createOptimProblem('fmincon', 'objective', objFcn, 'x0', [2, 2], 'lb', [0, 0], 'ub', [5, 5]);
+
+% Run Bayesian optimization
+results = bayesopt(objFcn, vars, 'MaxObjectiveEvaluations', maxIterations);
+
+% Extract the optimized variables and objective function values
+bestX = results.XAtMinObjective.x1;
+bestY = results.XAtMinObjective.x2;
+minObjective = results.MinObjective;
+
+% Display the results
+disp('Optimization Results:');
+disp(['Best X: ', num2str(bestX)]);
+disp(['Best Y: ', num2str(bestY)]);
+disp(['Min Objective: ', num2str(minObjective)]);
