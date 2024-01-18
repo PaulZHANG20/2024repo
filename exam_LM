@@ -1,0 +1,83 @@
+%
+clc
+clear all
+
+% Generate synthetic data
+x = linspace(0, 5, 100); % x-coordinates
+y_true = exp(-2*x); % True exponential function without noise
+y = y_true + 0.1*randn(size(x)); % Add Gaussian noise to the data
+
+% Define the exponential function
+exponential = @(x, p) exp(p(1)*x);
+
+% Initialize parameters
+p0 = -0.5; % Initial guess for the parameter
+pinitial = p0;
+lambda = 0.1; % Initial damping factor
+
+% Set maximum number of iterations and convergence threshold
+maxIterations = 10;
+tolerance = 1e-6;
+
+% Perform LM algorithm iterations
+iteration = 0;
+index(1:maxIterations)=0;
+psearching(1:maxIterations)=0;
+
+while iteration < maxIterations
+    iteration = iteration + 1;
+    index(iteration)=iteration;
+
+    % Compute the Jacobian matrix
+    J = -x .* exponential(x, p0);
+    
+    % Compute the residuals
+    r = y - exponential(x, p0);
+    
+    % Compute the LM update
+    %delta = (J'*J + lambda*diag(diag(J'*J))) \ (J'*r);
+    
+    g=-(J*r');
+    H=(J*J' + lambda*diag(diag(J*J'))) ;
+    delta=H \ g;
+
+    
+    % Update parameters
+    p_new = p0 + delta;
+    
+    psearching(iteration)=p_new;
+
+    % Compute the new residuals and error
+    r_new = y - exponential(x, p_new);
+    err_new = norm(r_new);
+
+    % Update damping factor and check for improvement
+    if err_new < tolerance
+        break;
+    elseif err_new < norm(r)
+        lambda = lambda / 10;
+        p0 = p_new;
+    else
+        lambda = lambda * 10;
+        p0 = p_new;
+    end
+end
+
+% Compute the fitted exponential function
+y_fit = exponential(x, p0);
+
+% Plot the results
+figure(1);
+plot(x, y, 'ko', 'DisplayName', 'Noisy Data');
+hold on;
+plot(x, y_true, 'r-', 'DisplayName', 'True Function');
+plot(x, y_fit, 'b-', 'DisplayName', 'Fitted Exponential');
+hold off;
+xlabel('x');
+ylabel('y');
+legend('Location', 'best');
+
+figure(2);
+index=[0,index(1:maxIterations)];
+psearching=[pinitial,psearching(1:maxIterations)];
+plot(index,psearching,'o-')
