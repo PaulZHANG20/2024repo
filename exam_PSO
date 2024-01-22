@@ -1,0 +1,50 @@
+% Particle Swarm Optimization Example
+clc
+clear all
+
+% Problem Parameters
+objectiveFunction = @(x) (x+1)^2; % Objective function to minimize
+numDimensions = 1; % Number of dimensions
+numParticles = 20; % Number of particles
+maxIterations = 100; % Maximum number of iterations
+
+% PSO Parameters
+w = 0.5; % Inertia weight
+c1 = 2; % Cognitive component weight
+c2 = 2; % Social component weight
+
+% Initialize particles
+positions = rand(numParticles, numDimensions); % Random initial positions
+velocities = zeros(numParticles, numDimensions); % Initial velocities
+personalBestPositions = positions; % Personal best positions
+personalBestValues = Inf(numParticles, 1); % Personal best values
+globalBestValue = Inf; % Global best value
+
+% PSO Loop
+for iteration = 1:maxIterations
+    % Evaluate objective function for each particle
+    values = arrayfun(objectiveFunction, positions);
+    
+    % Update personal best
+    updatePersonalBest = values < personalBestValues;
+    personalBestValues(updatePersonalBest) = values(updatePersonalBest);
+    personalBestPositions(updatePersonalBest, :) = positions(updatePersonalBest, :);
+    
+    % Update global best
+    [minValue, minIndex] = min(personalBestValues);
+    if minValue < globalBestValue
+        globalBestValue = minValue;
+        globalBestPosition = personalBestPositions(minIndex, :);
+    end
+    
+    % Update velocities and positions
+    r1 = rand(numParticles, numDimensions);
+    r2 = rand(numParticles, numDimensions);
+    velocities = w * velocities + c1 * r1 .* (personalBestPositions - positions) + ...
+        c2 * r2 .* (repmat(globalBestPosition, numParticles, 1) - positions);
+    positions = positions + velocities;
+end
+
+% Display the global best solution
+disp(['Global Best Solution: ', num2str(globalBestPosition)]);
+disp(['Global Best Value: ', num2str(globalBestValue)]);
