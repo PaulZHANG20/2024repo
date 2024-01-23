@@ -1,0 +1,120 @@
+clc
+clear all
+
+% Define the unknown function to be approximated
+unknownFunction = @(x) x.^3 + 1.5*x.^2 + x + 0.5; %sin(2*pi*x);
+
+% Generate input-output data points
+xData = linspace(-2, 2, 50);
+yData = unknownFunction(xData);
+
+figure(1);
+plot(xData, yData, 'o');
+hold on
+
+% Define the fitness function
+fitnessFunction = @(coefficients) 1.0/mean((unknownFunction(xData) - polyval(coefficients, xData)).^2);
+
+% Set up the GA parameters
+populationSize = 100;
+numGenerations = 200;
+mutationRate = 0.1;
+crossoverFraction = 0.8;
+
+
+% Initialize the population
+population = rand(populationSize, 4) - 0.5;  % Assuming a cubic polynomial with 4 coefficients
+
+% Main GA loop
+for generation = 1:numGenerations
+    % Evaluate fitness
+    fitnessValues=zeros(populationSize,1);
+    for nn=1:populationSize
+        fitnessValues(nn) = fitnessFunction([population(nn,:)]);
+    end
+    
+    % Display the best fitness in this generation
+    [minfit,index]=min(fitnessValues);
+    bestFitness = min(fitnessValues);
+    disp(['Generation: ', num2str(generation), ', Best Fitness: ', num2str(bestFitness)]);
+
+    % Selection
+    selectedIndices = rouletteWheelSelection(fitnessValues);
+    selectedPopulation = population(selectedIndices, :);
+    
+    % Crossover
+    offspring = crossover(selectedPopulation, crossoverFraction);
+    
+    % Mutation
+    mutatedOffspring = mutate(offspring, mutationRate);
+    
+    % Create the new population
+    oldpopulation=population;
+    newpopulation = [selectedPopulation; mutatedOffspring];
+    %ranking the new pupulations
+    indmax=populationSize*(1+crossoverFraction);
+    for ind=1:indmax
+        fitnessValues(ind) = fitnessFunction([newpopulation(ind,:)]);
+    end
+    [rankedfv,rankedindex]=sort(fitnessValues,'descend');
+    for selind=1:populationSize
+        population(selind,:)=newpopulation(rankedindex(selind),:);
+    end
+    
+end
+
+% Find the best individual in the final population
+
+bestIndividual = oldpopulation(index, :)
+
+% Plot the approximation
+x = linspace(-2, 2, 100);
+yApprox = polyval(bestIndividual, x);
+
+%figure;
+plot(x, yApprox, 'LineWidth', 2);
+legend('Data points', 'Approximation');
+xlabel('x');
+ylabel('y');
+
+
+function selectedIndices = rouletteWheelSelection(fitnessValues)
+    rouletteProbabilities = fitnessValues / sum(fitnessValues);
+    cumulativeProbabilities = cumsum(rouletteProbabilities);
+    numSelections = numel(fitnessValues);
+    
+    selectedIndices = zeros(size(fitnessValues));
+    for i = 1:numSelections
+        r = rand();
+        selectedIndices(i) = find(cumulativeProbabilities >= r, 1);
+    end
+end
+
+
+function mutatedOffspring = mutate(offspring, mutationRate)
+    [numOffspring, numGenes] = size(offspring);
+    
+    mutatedOffspring = offspring;
+    for i = 1:numOffspring
+        for j = 1:numGenes
+            if rand() < mutationRate
+                mutatedOffspring(i, j) = mutatedOffspring(i, j) + randn();
+            end
+        end
+    end
+end
+
+
+function offspring = crossover(selectedPopulation, crossoverFraction)
+    [numParents, numGenes] = size(selectedPopulation);
+    numOffspring = round(crossoverFraction * numParents);
+    
+    offspring = zeros(numOffspring, numGenes);
+    for i = 1:numOffspring
+        parent1 = selectedPopulation(randi(numParents), :);
+        parent2 = selectedPopulation(randi(numParents), :);
+        
+        crossoverPoint = randi(numGenes - 1);
+        offspring(i, :) = [parent1(1:crossoverPoint), parent2(crossoverPoint+1:end)];
+    end
+end
