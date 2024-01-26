@@ -12,12 +12,12 @@ it should work well in its present form.
 It approximates a given function with noisy data. Directly copy the code into a matlab .m file and
 it should work well in its present form. 
 
-[4]"exam_PSO" is an example of Particle Swarm Optimization algorithm, with the matlab implementation.
-It finds the minimum value of a given function. Directly copy the code into a matlab .m file and
+[4]"exam_GA" is an example of Genetic Algorithm, with the matlab implementation.
+It approximates a given function by fitting. Directly copy the code into a matlab .m file and
 it should work well in its present form. 
 
-[5]"exam_GA" is an example of Genetic Algorithm, with the matlab implementation.
-It approximates a given function by fitting. Directly copy the code into a matlab .m file and
+[5]"exam_PSO" is an example of Particle Swarm Optimization algorithm, with the matlab implementation.
+It finds the minimum value of a given function. Directly copy the code into a matlab .m file and
 it should work well in its present form. 
 
 [6]"exam_gpr" is an example of Gaussian process regression, with the matlab implementatin. 
