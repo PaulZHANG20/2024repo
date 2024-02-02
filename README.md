@@ -26,3 +26,7 @@ It predicts the mean and 95% trust region (2sigma) of a noisy sin(x) with the GP
 [7]"exam_bayesopt" is an example of bayesian optimization, with the matlab builtin function. 
 It finds the minimum of a fiven function. Directly copy the code into a matlab .m file and it 
 should work well in its present form. 
+
+[8]"exam_PSO_const" is an example of Particle Swarm Optimization algorithm, with the matlab implementation. 
+It finds the minimum value of a given function with the constraints. 
+Directly copy the code into a matlab .m file and it should work well in its present form.
