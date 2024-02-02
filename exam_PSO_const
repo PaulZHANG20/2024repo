@@ -1,0 +1,80 @@
+clc
+clear all
+
+% Define the Sphere function
+f = @(x) sum(x.^2);
+
+% Define the constraint function
+constraintFcn = @(x) deal(x(1) + x(2) + 2, -x(1) - x(2) - 8);
+
+% Set the bounds of the search space
+lb = [-5; -5]; % Lower bounds
+ub = [5; 5];   % Upper bounds
+
+% Set the parameters for PSO
+numParticles = 50;
+maxIterations = 100;
+
+% Initialize the particle positions and velocities
+positions = lb + (ub - lb) .* rand(2, numParticles);
+velocities = zeros(2, numParticles);
+
+% Initialize the personal best positions and fitness values
+personalBestPositions = positions;
+personalBestFitness = inf(1, numParticles);
+
+% Initialize the global best position and fitness value
+globalBestFitness = inf;
+globalBestPosition = zeros(2, 1);
+
+% Perform PSO iterations
+for iteration = 1:maxIterations
+    % Evaluate fitness values and constraints
+    fitnessValues = f(positions);
+    
+    for indcon = 1:numParticles
+        [c(indcon), ceq(indcon)] = constraintFcn(positions(:,indcon));
+    end
+    % Check if any constraints are violated
+    violatedIndices1 = find(c > 0);
+    fitnessValues(violatedIndices1) = inf;
+    violatedIndices2 = find(ceq > 0);
+    fitnessValues(violatedIndices2) = inf;
+    
+    % Update personal best positions and fitness values
+    updateIndices = find (fitnessValues < personalBestFitness);
+    personalBestPositions(:, updateIndices) = positions(:, updateIndices);
+    personalBestFitness(updateIndices) = fitnessValues(updateIndices);
+    
+    % Update global best position and fitness value
+    [minFitness, minIndex] = min(personalBestFitness);
+    if minFitness < globalBestFitness
+        globalBestFitness = minFitness;
+        globalBestPosition = personalBestPositions(:, minIndex);
+    end
+    
+    % Update particle velocities and positions
+    inertiaWeight = 0.729; % Inertia weight
+    cognitiveWeight = 1.49445; % Cognitive weight
+    socialWeight = 1.49445; % Social weight
+    
+    r1 = rand(2, numParticles);
+    r2 = rand(2, numParticles);
+    
+    velocities = inertiaWeight * velocities + ...
+        cognitiveWeight * r1 .* (personalBestPositions - positions) + ...
+        socialWeight * r2 .* (globalBestPosition - positions);
+    
+    % Apply velocity limits
+    velocities = max(velocities, lb - positions);
+    velocities = min(velocities, ub - positions);
+    
+    positions = positions + velocities;
+end
+
+% Print the result
+fprintf('Minimum found at x = [%.4f, %.4f]\n', globalBestPosition(1), globalBestPosition(2));
+fprintf('Fitness value: %.4f\n', globalBestFitness);
+
+f = @(x1,x2) x1.^2+x2.^2;
+figure(1); clf; fcontour(f,[-5 5 -5 5],'MeshDensity',50,'LevelStep',2); axis equal; hold on; grid on
