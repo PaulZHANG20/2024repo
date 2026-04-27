@@ -1,4 +1,4 @@
-# 2024repo
+# 2024repo, updated in 2026
 
 [1]"exam_GD" is an example of gradient descent optimization, with the matlab implementation.
 It finds the minimum of a given function. Directly copy the code into a matlab .m file and
