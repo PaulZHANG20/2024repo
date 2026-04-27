@@ -147,3 +147,13 @@ if __name__ == "__main__":
     print(f"Finished in {steps} steps.")
     print(f"Final Agent Guess    -> a: {obs[0]:.2f}, b: {obs[1]:.2f}, c: {obs[2]:.2f}")
     print(f"Final MSE            -> {obs[3]:.4f}")
+
+
+# output will be something like below.
+#--- Testing the Agent ---
+#Initial Random Guess -> a: -0.43, b: 0.92, c: 0.38 | Initial MSE: 3.88
+#Target Parameters    -> a: 2.50, b: 1.30, c: 0.80
+#
+#Finished in 8 steps.
+#Final Agent Guess    -> a: 2.41, b: 1.31, c: 0.76
+#Final MSE            -> 0.0085
