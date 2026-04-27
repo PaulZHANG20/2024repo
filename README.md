@@ -30,3 +30,7 @@ should work well in its present form.
 [8]"exam_PSO_const" is an example of Particle Swarm Optimization algorithm, with the matlab implementation. 
 It finds the minimum value of a given function with the constraints. 
 Directly copy the code into a matlab .m file and it should work well in its present form.
+
+#added in 2026
+[9]"exam_RL" is an example of Reinforcement Learning algorithm, with Python implementation. 
+It solves a problem of regression. It should work in its present form. 
